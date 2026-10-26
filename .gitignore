@@ -74,3 +74,15 @@ Thumbs.db
 backend/uploads/*
 !backend/uploads/.gitkeep
 
+# Terraform local files and sensitive state
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan
+*.tfplan
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+crash.log
+crash.*.log

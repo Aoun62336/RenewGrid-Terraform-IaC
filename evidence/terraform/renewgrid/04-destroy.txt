@@ -1,0 +1,38 @@
+docker_compose.renewgrid: Refreshing state... [id=renewgrid-iac]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # docker_compose.renewgrid will be destroyed
+  - resource "docker_compose" "renewgrid" {
+      - config_paths      = [
+          - "C:/Users/AOUN/Desktop/RenewGrid-Terraform-IaC/compose.yaml",
+        ] -> null
+      - env_files         = [
+          - "C:/Users/AOUN/Desktop/RenewGrid-Terraform-IaC/.env.compose",
+        ] -> null
+      - id                = "renewgrid-iac" -> null
+      - project_directory = "C:/Users/AOUN/Desktop/RenewGrid-Terraform-IaC" -> null
+      - project_name      = "renewgrid-iac" -> null
+      - remove_orphans    = false -> null
+      - wait              = true -> null
+      - wait_timeout      = "10m" -> null
+    }
+
+Plan: 0 to add, 0 to change, 1 to destroy.
+
+Changes to Outputs:
+  - renewgrid_url = "http://127.0.0.1:8090" -> null
+
+Do you really want to destroy all resources?
+  Terraform will destroy all your managed infrastructure, as shown above.
+  There is no undo. Only 'yes' will be accepted to confirm.
+
+  Enter a value: 
+docker_compose.renewgrid: Destroying... [id=renewgrid-iac]
+docker_compose.renewgrid: Destruction complete after 2s
+
+Destroy complete! Resources: 1 destroyed.

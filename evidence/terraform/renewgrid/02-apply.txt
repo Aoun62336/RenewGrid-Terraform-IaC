@@ -1,0 +1,9 @@
+docker_compose.renewgrid: Creating...
+docker_compose.renewgrid: Still creating... [00m10s elapsed]
+docker_compose.renewgrid: Creation complete after 18s [id=renewgrid-iac]
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+renewgrid_url = "http://127.0.0.1:8090"

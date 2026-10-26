@@ -1,133 +1,83 @@
-# RenewGrid — Jenkins CI/CD on AWS EC2
+﻿# RenewGrid — Infrastructure as Code with Terraform
 
-**Elevate Labs | DevOps Internship — Task 2**
+**Elevate Labs | DevOps Internship — Task 3**
 
 ## Overview
 
-This repository demonstrates an automated Jenkins CI/CD pipeline for
-RenewGrid, a full-stack e-waste recycling and rewards application
-built with React, FastAPI, and PostgreSQL.
+RenewGrid is a full-stack, role-based e-waste recycling and rewards management platform built with React, FastAPI, PostgreSQL, and Alembic.
 
-The implementation extends the completed containerization work from
-Task 1 and introduces Jenkins-based validation, security scanning,
-Docker Hub image publication, and Docker Compose deployment on AWS EC2.
+This repository demonstrates Infrastructure as Code (IaC) using Terraform and the Docker provider to automate the provisioning, lifecycle management, health verification, and teardown of the complete multi-container RenewGrid application.
+
+It builds directly upon the foundational containerization established in **Task 1** and the automated Jenkins CI/CD pipeline and security hardening completed in **Task 2**.
 
 ## Technology Stack
 
-| Component          | Technology                    |
-| ------------------ | ----------------------------- |
-| Source Control     | Git and GitHub                |
-| CI/CD              | Jenkins Declarative Pipeline  |
-| Infrastructure     | AWS EC2, Ubuntu               |
-| Containers         | Docker Engine, Docker Compose |
-| Image Registry     | Docker Hub                    |
-| Security Scanning  | Trivy                         |
-| Frontend           | React, Vite, Nginx            |
-| Backend            | Python, FastAPI               |
-| Database           | PostgreSQL                    |
-| Migrations         | Alembic                       |
-| Testing            | Pytest, ESLint                |
-| Software Inventory | CycloneDX SBOM                |
+| Layer | Technology | Purpose |
+|---|---|---|
+| Infrastructure as Code | Terraform (v1.17.0) | Declarative infrastructure definition and lifecycle orchestration |
+| Terraform Provider | `kreuzwerker/docker` (v4.6.0) | Docker Engine and Docker Compose lifecycle provider |
+| Container Orchestration | Docker Compose v2 | Multi-container application specification and networking |
+| CI Validation | GitHub Actions | Automated Terraform formatting, initialization, and Compose validation |
+| Frontend | React 19, Vite, TailwindCSS | Web user interface and four role-based portals |
+| Web Server & Proxy | Nginx (Alpine) | Static file serving and reverse proxy to FastAPI backend |
+| Backend API | Python 3.12, FastAPI, Uvicorn | RESTful API, authentication, pickup state machine, QR verification |
+| Database | PostgreSQL 17 | Persistent relational database storage |
+| Database Migrations | Alembic | Version-controlled schema migrations |
+| Container Registry | Docker Hub | Digest-pinned application container images (`fire2686`) |
 
 ## Architecture
 
-GitHub main branch
-→ Jenkins
-→ Source security scan
-→ Backend and frontend validation
-→ Docker image builds
-→ Image vulnerability scan and SBOM generation
-→ Docker Hub
-→ Docker Compose on AWS EC2
-→ Deployment health verification
-
-## Jenkins Pipeline
-
-The Jenkinsfile defines ten stages:
-
-1. Checkout
-2. Secret Scan
-3. Backend Tests
-4. Frontend Validation
-5. Docker Build
-6. Image Security Scan
-7. Generate SBOM
-8. Docker Hub Publish
-9. Deploy to EC2
-10. Deployment Verification
-
-The pipeline stops when a required stage fails.
-
-Jenkins uses SCM polling to detect changes to the main branch.
-Pull requests are validated separately before merging.
+```text
+GitHub main branch / feature branch
+  → GitHub Actions Validation (terraform fmt, validate, compose config)
+  → Local Terraform Execution (`terraform apply`)
+  → Docker Provider provisions `docker_compose.renewgrid` ("renewgrid-iac")
+  → PostgreSQL (`db`) passes health check
+  → Alembic (`migrate`) applies schema updates
+  → FastAPI (`api`) starts and passes health check
+  → Nginx / React (`web`) exposes application at http://localhost:8090
+  → Browser interacts with RenewGrid Web Application
+```
 
 ## Containerized Application
 
-The Docker Compose configuration includes four services:
+The Docker Compose configuration (`compose.yaml`) defines four coordinated services:
 
-- `db` — PostgreSQL
-- `migrate` — Alembic migrations
-- `api` — FastAPI backend
-- `web` — React frontend served by Nginx
+- `db` — PostgreSQL 17 database service on internal network `data`
+- `migrate` — One-time Alembic migration service executing `alembic upgrade head`
+- `api` — FastAPI application backend exposed internally on port `8000`
+- `web` — Nginx reverse proxy serving compiled React assets and routing `/api` traffic
 
-The database and upload directories use persistent Docker volumes.
+Database state and user upload directories are backed by persistent Docker named volumes (`postgres_data` and `uploads_data`).
 
-## Image Repositories
+## Verified Image Repositories
 
-Backend:
-`docker.io/fire2686/renewgrid-jenkins-api`
+The deployment uses the immutable, digest-pinned images published during Jenkins Build #7 in Task 2:
 
-Frontend:
-`docker.io/fire2686/renewgrid-jenkins-web`
+- **Backend:** `docker.io/fire2686/renewgrid-jenkins-api@sha256:6006bbabb86e874edadaebe1330a2a5853add5c863a295ee8491bd17c7354cd1`
+- **Frontend:** `docker.io/fire2686/renewgrid-jenkins-web@sha256:dc8166fc3ea94caa3ed0e46b90aac039be611cbc0dda40336e943daeb6879e7d`
 
-Images use commit-specific tags, and deployment uses published digests.
+## Security and Best Practices
 
-## Security
-
-The demonstration includes:
-
-- Restricted EC2 inbound security-group access
-- Jenkins bound to the loopback interface
-- SSH port forwarding for web access
-- Jenkins-managed Docker Hub credentials
-- No credentials committed to Git
-- Secret scanning
-- Container vulnerability scanning
-- Non-root application runtime containers
-- Internal Docker networking for PostgreSQL
-- Pull-request validation before main-branch delivery
-
-## Deployment
-
-Jenkins runs on the same EC2 instance as the RenewGrid containers.
-
-The pipeline pulls images from Docker Hub and deploys the application
-with Docker Compose.
-
-Deployment configuration is stored under `/opt/renewgrid`.
-
-The application is accessed through SSH port forwarding:
-
-- Jenkins: `http://localhost:8081`
-- RenewGrid: `http://localhost:8080`
-
-No public domain or production HTTPS endpoint is configured.
+- **Non-Root Containers:** Backend and web services execute with unprivileged user permissions.
+- **Network Segmentation:** PostgreSQL is placed on an isolated `internal: true` Docker network inaccessible from the host network.
+- **Port Isolation:** The web service binds strictly to the loopback interface (`127.0.0.1:8090`).
+- **Secret Isolation:** Environment secrets are managed via Git-ignored `.env.compose` with strict exclusions in `.gitignore`.
+- **State Protection:** Sensitive Terraform state (`*.tfstate`) and binary plan files (`*.tfplan`) are excluded from version control.
+- **Provider Pinning:** Terraform provider versions are strictly locked in `main.tf` and `.terraform.lock.hcl`.
 
 ## Documentation
 
-- [`APPLICATION.md`](APPLICATION.md) — oconcise project and implementation overview
-- [`DEVOPS-TASK1.md`](DEVOPS-TASK1.md) — completed Task 1 implementation
-- [`DEVOPS-TASK2.md`](DEVOPS-TASK2.md) — Jenkins CI/CD architecture, operations, and execution evidence
-- [`jenkins-verification.md`](evidence/jenkins/jenkins-verification.md) — verified execution record and evidence
+- [`APPLICATION.md`](APPLICATION.md) — Concise project and architecture overview
+- [`DEVOPS-TASK1.md`](DEVOPS-TASK1.md) — Task 1: Containerization and GitHub Actions CI/CD
+- [`DEVOPS-TASK2.md`](DEVOPS-TASK2.md) — Task 2: Jenkins CI/CD on AWS EC2 with Docker Hub publishing
+- [`DEVOPS-TASK3.md`](DEVOPS-TASK3.md) — Task 3: Infrastructure as Code with Terraform and Docker
+- [`evidence/terraform/renewgrid/`](evidence/terraform/renewgrid/) — Task 3 Terraform execution plans, service verifications, and screenshots
+- [`evidence/jenkins/jenkins-verification.md`](evidence/jenkins/jenkins-verification.md) — Task 2 verified execution record
 
 ## Scope
 
-This project is an internship demonstration.
-
-It is not presented as a production-grade, highly available platform.
-Production operation would require additional build isolation,
-monitoring, backup and recovery procedures, hardened secret handling,
-and a properly configured public HTTPS endpoint.
+This project is an internship demonstration. It illustrates Infrastructure as Code concepts for local reproducible environments. Production operation would introduce remote encrypted Terraform state (e.g. AWS S3 + DynamoDB), dedicated cloud resources (VPC, ECS/EKS or EC2), automated rollback policies, and TLS termination.
 
 ## Author
 

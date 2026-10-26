@@ -1,4 +1,4 @@
-# RenewGrid — Jenkins CI/CD Architecture and Operations
+﻿# RenewGrid — Jenkins CI/CD Architecture and Operations
 
 **Elevate Labs | DevOps Internship — Task 2**
 
@@ -518,7 +518,7 @@ The SCM-triggered Build #7 followed a documentation pull-request merge and still
 
 The verified pipeline execution is documented in:
 
-**[Jenkins Build #7 — Verification Record](evidenc/jenkins/jenkins-verification.md)**
+**[Jenkins Build #7 — Verification Record](evidence/jenkins/jenkins-verification.md)**
 
 The evidence includes:
 

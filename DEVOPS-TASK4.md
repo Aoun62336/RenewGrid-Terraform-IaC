@@ -143,12 +143,26 @@ The repository documentation establishes safe Git recovery procedures:
 
 Implementation evidence is organized under [`evidence/git-workflow/`](evidence/git-workflow/):
 
+### 9.1 Evidence Summary
+
 | Evidence | File | Description |
 | --- | --- | --- |
-| **PR Validation CI** | `01-pr-validation-ci.png` | GitHub Actions PR validation passing Trivy scanning, frontend build/lint, backend tests, and Terraform/Compose validation |
-| **Branch Rulesets** | `02-branch-ruleset.png` | Protected branch rulesets for `main` and `dev` enforcing PR reviews and required status checks |
-| **Release Verification** | `03-release-tag-verify.png` | GitHub Actions workflow execution verifying annotated tag `v0.1.0` format and provenance against `main` |
-| **Published Release** | `04-github-release.png` | Published GitHub Release `v0.1.0` with version notes and changelog integration |
+| **Feature Integration PR** | [`01-feature-integration.png`](evidence/git-workflow/01-feature-integration.png) | PR #7 merged into `dev` from `feature/release-management` with all 3 automated CI checks passing (`Validate application`, `Validate Terraform`, `Validate Compose`) |
+| **Release Promotion PR** | [`02-release-promotion.png`](evidence/git-workflow/02-release-promotion.png) | PR #8 merged into `main` from `dev` with verified CI status checks promoting the release baseline (commit `d1dad84`) |
+| **Versioned GitHub Release** | [`03-versioned-release.png`](evidence/git-workflow/03-versioned-release.png) | Official GitHub Release `v0.1.0` published on commit `d1dad84` with full changelog integration, semantic notes, and verified tag |
+
+---
+
+### 9.2 Visual Evidence
+
+#### 1. Feature Branch Integration into `dev` (PR #7)
+![Feature Branch Integration](evidence/git-workflow/01-feature-integration.png)
+
+#### 2. Release Promotion into `main` (PR #8)
+![Release Promotion](evidence/git-workflow/02-release-promotion.png)
+
+#### 3. Published GitHub Release `v0.1.0`
+![Published GitHub Release](evidence/git-workflow/03-versioned-release.png)
 
 ## 10. Scope
 

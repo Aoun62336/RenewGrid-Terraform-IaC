@@ -1,4 +1,4 @@
-name: RenewGrid — Pull Request Validation
+name: RenewGrid Pull Request Validation
 
 on:
   pull_request:

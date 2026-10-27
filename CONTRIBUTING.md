@@ -44,14 +44,14 @@ Keep commits focused on one logical change.
 7. Review the changes before merging.
 8. Update the local integration branch after merging.
 
-Pull requests must describe the change, validation performed, and relevant risks.
+Pull requests must describe the change, validation performed, and relevant risks using the [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md).
 
 ## Required Validation
 
 The repository uses GitHub Actions for:
 
-- Application validation and secret scanning
-- Terraform formatting and configuration validation
+- Application validation and secret scanning ([`pr-validation.yml`](.github/workflows/pr-validation.yml))
+- Terraform formatting and configuration validation ([`terraform-validate.yml`](.github/workflows/terraform-validate.yml))
 - Docker Compose configuration validation
 
 All configured required checks must pass before integration.
@@ -62,9 +62,9 @@ All configured required checks must pass before integration.
 2. Open a release pull request from `dev` to `main`.
 3. Verify required checks.
 4. Merge the approved release.
-5. Update the changelog as part of release preparation.
+5. Update [`CHANGELOG.md`](CHANGELOG.md) as part of release preparation.
 6. Create an annotated version tag on the released commit.
-7. Verify the tag and publish a GitHub Release.
+7. Verify the tag with the [Release Verification Workflow](.github/workflows/release-verify.yml) and publish a GitHub Release.
 
 Release tags follow the format `vMAJOR.MINOR.PATCH`.
 

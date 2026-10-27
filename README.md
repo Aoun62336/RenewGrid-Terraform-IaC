@@ -1,4 +1,4 @@
-﻿# RenewGrid — Infrastructure as Code with Terraform
+# RenewGrid — Infrastructure as Code with Terraform
 
 **Elevate Labs | DevOps Internship — Task 3**
 
@@ -39,14 +39,14 @@ Browser → Nginx/React → FastAPI → PostgreSQL
 
 ## Infrastructure Configuration
 
-| Component                  | File                                       |
-| -------------------------- | ------------------------------------------ |
-| Terraform                  | [`terraform/main.tf`](terraform/main.tf)   |
-| Docker Compose             | [`compose.yaml`](compose.yaml)             |
-| Local environment template | [`.env.compose.example`](.env.compose.example) |
+| Component                  | File                                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| Terraform                  | [`terraform/main.tf`](terraform/main.tf)                                               |
+| Docker Compose             | [`compose.yaml`](compose.yaml)                                                         |
+| Local environment template | [`.env.compose.example`](.env.compose.example)                                         |
 | CI validation              | [`.github/workflows/terraform-validate.yml`](.github/workflows/terraform-validate.yml) |
-| Implementation details     | [`DEVOPS-TASK3.md`](DEVOPS-TASK3.md)       |
-| Execution evidence         | [`evidence/terraform/renewgrid/`](evidence/terraform/renewgrid/) |
+| Implementation details     | [`DEVOPS-TASK3.md`](DEVOPS-TASK3.md)                                                   |
+| Execution evidence         | [`evidence/terraform/renewgrid/`](evidence/terraform/renewgrid/)                       |
 
 ## Local Setup
 
@@ -130,17 +130,19 @@ Named Docker volumes may remain after destruction to preserve application data.
 
 ## Automation
 
-GitHub Actions validates Terraform formatting and configuration, alongside the Docker Compose configuration.
+GitHub Actions provides automated continuous integration across the repository:
 
-The original RenewGrid application validation workflow is preserved.
+- **Terraform & Compose:** [`terraform-validate.yml`](.github/workflows/terraform-validate.yml) checks Terraform formatting, initialization, validation, and Docker Compose configuration on `main` and `dev`.
+- **Pull Request Validation:** [`pr-validation.yml`](.github/workflows/pr-validation.yml) performs Trivy secret scanning, frontend build and lint checks, and backend regression tests on pull requests targeting `main` and `dev`.
+- **Release Verification:** [`release-verify.yml`](.github/workflows/release-verify.yml) verifies version tag syntax, annotated tag metadata, and ancestry against `main` on release tag pushes.
 
 ## Verification Evidence
 
-| Evidence | Description |
-|---|---|
-| [Terraform Plan & Verification](evidence/terraform/renewgrid/01-terraform-verified.png) | Successful Terraform init, validate, and plan execution |
-| [Docker Services](evidence/terraform/renewgrid/02-renewgrid-services.png) | All 4 Docker Compose services running and healthy |
-| [Web Application](evidence/terraform/renewgrid/03-renewgrid-application.png) | Running RenewGrid UI and API verified at `http://localhost:8090` |
+| Evidence                                                                                | Description                                                      |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Terraform Plan & Verification](evidence/terraform/renewgrid/01-terraform-verified.png) | Successful Terraform init, validate, and plan execution          |
+| [Docker Services](evidence/terraform/renewgrid/02-renewgrid-services.png)               | All 4 Docker Compose services running and healthy                |
+| [Web Application](evidence/terraform/renewgrid/03-renewgrid-application.png)            | Running RenewGrid UI and API verified at `http://localhost:8090` |
 
 All command logs (`01-plan.txt`, `02-apply.txt`, `03-reconciliation.txt`, `04-destroy.txt`) are recorded under [`evidence/terraform/renewgrid/`](evidence/terraform/renewgrid/).
 
@@ -156,3 +158,17 @@ For full technical specifications, architecture diagrams, and detailed step-by-s
 This is a local internship demonstration.
 
 Terraform manages the Docker Compose project as one resource. The implementation does not provide cloud hosting or production high availability.
+
+## Task 4: Git Workflow and Release Management
+
+The repository implements a structured Git development and release workflow with feature branches, a development integration branch, protected pull requests, automated validation, and versioned GitHub Releases.
+
+The implementation extends the existing RenewGrid CI/CD and Terraform work without introducing additional deployment infrastructure.
+
+- [Implementation and Verification](DEVOPS-TASK4.md)
+- [Contribution Guidelines](CONTRIBUTING.md)
+- [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md)
+- [PR Validation Workflow](.github/workflows/pr-validation.yml)
+- [Release Verification Workflow](.github/workflows/release-verify.yml)
+- [Changelog](CHANGELOG.md)
+- [GitHub Releases](https://github.com/Aoun62336/RenewGrid-Terraform-IaC/releases)
